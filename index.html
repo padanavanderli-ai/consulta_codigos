@@ -328,21 +328,35 @@ c.type=ok.type="button";c.onclick=close;acts.appendChild(c);acts.appendChild(ok)
 function go(){if(first){if(pw.value.length<6){msg.className="msg err";msg.textContent="Use ao menos 6 caracteres.";return}close();openSend(pw.value,true)}
 else{if(pw.value!==PW){msg.className="msg err";msg.textContent="Senha incorreta.";return}close();openSend(PW,false)}}
 ok.onclick=go;pw.addEventListener("keydown",function(e){if(e.key==="Enter")go()})})}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
+function guessRepo(){var h=location.hostname;if(/\.github\.io$/.test(h)){var p=location.pathname.split("/")[1];return h.split(".")[0]+"/"+(p||h)}return ""}
+function b64(u){var o="",i;for(i=0;i<u.length;i+=32768)o+=String.fromCharCode.apply(null,u.subarray(i,i+32768));return btoa(o)}
+function download(out){var bl=new Blob([out],{type:"application/octet-stream"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="dados.enc";document.body.appendChild(a);a.click();a.remove()}
+function publish(R,T,out){var url="https://api.github.com/repos/"+R+"/contents/dados.enc",H={Authorization:"Bearer "+T,Accept:"application/vnd.github+json"};
+return fetch(url,{headers:H,cache:"no-store"}).then(function(r){if(r.status===200)return r.json().then(function(j){return j.sha});if(r.status===404)return undefined;throw new Error("o GitHub respondeu "+r.status+" ao consultar o repositório (confira o nome e o token).")})
+.then(function(sha){var body={message:"Atualização da base "+new Date().toISOString(),content:b64(out)};if(sha)body.sha=sha;return fetch(url,{method:"PUT",headers:H,body:JSON.stringify(body)})})
+.then(function(r){if(!r.ok)throw new Error("falha ao gravar ("+r.status+"). O token precisa da permissão Contents: Read and write neste repositório.")})}
 function openSend(base,first){modal(function(m,close){
+m.classList.add("wide");
 m.appendChild(el("h3","","Atualizar base de dados"));
-m.appendChild(el("p","","Selecione o Excel com as abas consulta1 e consulta2. A página valida, criptografa e gera o arquivo dados.enc para você baixar."));
+m.appendChild(el("p","","Selecione o Excel com as abas consulta1 e consulta2. A página valida, criptografa e, se o token do GitHub estiver preenchido, publica sozinha. Sem token, ela baixa o dados.enc para envio manual."));
 var f=field(m,"Arquivo Excel","file");f.accept=".xlsx,.xls";
 var np=first?null:field(m,"Nova senha de acesso (opcional — deixe vazio para manter)","password");
-var msg=el("div","msg"),acts=el("div","acts"),c=el("button","ghost","Fechar"),ok=el("button","","Gerar dados.enc");
+var rp=field(m,"Repositório GitHub (usuario/repositorio)","text",ls("repo")||guessRepo());
+var tk=field(m,"Token do GitHub (fica salvo só neste navegador; vazio = baixar o arquivo)","password",ls("tok"));
+var msg=el("div","msg"),acts=el("div","acts"),c=el("button","ghost","Fechar"),ok=el("button","","Gerar e publicar");
 c.type=ok.type="button";c.onclick=close;acts.appendChild(c);acts.appendChild(ok);m.appendChild(msg);m.appendChild(acts);
 function say(t,k){msg.className="msg "+(k||"");msg.textContent=t}
 ok.onclick=function(){var F=f.files[0],pwf=base;if(!F){say("Selecione um arquivo.","err");return}
 if(np&&np.value){if(np.value.length<6){say("A nova senha precisa ter ao menos 6 caracteres.","err");return}pwf=np.value}
 ok.disabled=true;say("Lendo arquivo…");var d;
 F.arrayBuffer().then(function(buf){d=parse(buf);say("Criptografando "+d.a.length.toLocaleString("pt-BR")+" itens…");return encrypt(d,pwf)})
-.then(function(out){var bl=new Blob([out],{type:"application/octet-stream"}),a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="dados.enc";document.body.appendChild(a);a.click();a.remove();
-DATA=d;PW=pwf;try{sessionStorage.setItem("pw",pwf)}catch(e){}build();search();
-say("dados.enc gerado ("+(out.length/1048576).toFixed(1).replace(".",",")+" MB) e baixado. Envie-o ao repositório no lugar do anterior e remova o dados.xlsx. Linhas lidas — consulta1: "+d.n1.toLocaleString("pt-BR")+" · consulta2: "+d.n2.toLocaleString("pt-BR")+".","ok")})
+.then(function(out){DATA=d;PW=pwf;try{sessionStorage.setItem("pw",pwf)}catch(e){}build();search();
+var info=" Linhas lidas — consulta1: "+d.n1.toLocaleString("pt-BR")+" · consulta2: "+d.n2.toLocaleString("pt-BR")+".",sz=(out.length/1048576).toFixed(1).replace(".",",")+" MB",R=rp.value.trim(),T=tk.value.trim();
+if(R&&T){say("Publicando no GitHub…");
+return publish(R,T,out).then(function(){ls("repo",R);ls("tok",T);say("Publicado ("+sz+")! O site atualiza em 1 a 2 minutos para todos."+info,"ok")})
+.catch(function(e){download(out);say("Não foi possível publicar: "+e.message+" O dados.enc foi baixado para envio manual."+info,"err")})}
+download(out);say("dados.enc gerado ("+sz+") e baixado. Envie-o ao repositório no lugar do anterior."+info,"ok")})
 .catch(function(e){say("Erro: "+e.message,"err")}).then(function(){ok.disabled=false})}})}
 document.getElementById("upBtn").onclick=openUpload;
 var root=document.documentElement,thb=document.getElementById("th");
