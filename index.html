@@ -382,7 +382,7 @@ function setTheme(t){root.setAttribute("data-theme",t);thb.textContent=t==="dark
 var sv="";try{sv=localStorage.getItem("tema")||""}catch(e){}
 setTheme(sv==="light"?"light":"dark");
 thb.onclick=function(){setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark")};
-var AVISO="Verifique sempre a data de atualização";
+var AVISO="Verifique a data de atualização";
 (function(){var t=document.getElementById("tick"),k=document.getElementById("trk");if(!AVISO){return}
 var g=0,i,j;for(g=0;g<2;g++){var w=document.createElement("div");w.style.display="inline-flex";for(j=0;j<8;j++){var sp=document.createElement("span");sp.textContent=AVISO;w.appendChild(sp)}k.appendChild(w)}
 t.hidden=false})();
