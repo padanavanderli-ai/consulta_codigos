@@ -103,9 +103,19 @@ dl>div.f dt{color:var(--fc,var(--muted));font-weight:700}
 .lock .mod{text-align:center}.lock .mod input{text-align:center;font-size:16px;letter-spacing:.2em}
 .lock .mod button{width:100%;margin-top:14px}
 .eyebrow{display:flex;align-items:center;gap:9px}
+.tick{overflow:hidden;white-space:nowrap;background:var(--tkbg);color:var(--tkink);border-bottom:1px solid var(--tkline);font-size:12px;font-weight:600;letter-spacing:.02em}
+.trk{display:inline-flex;padding:8px 0;animation:tk 45s linear infinite;will-change:transform}
+.tick:hover .trk{animation-play-state:paused}
+.trk span{padding:0 26px;display:inline-flex;align-items:center;gap:9px}
+.trk span::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.85}
+@keyframes tk{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.trk{animation:none}}
+:root{--tkbg:#fff3d6;--tkink:#7a4a00;--tkline:#f0d9a0}
+:root[data-theme="dark"]{--tkbg:#2a2113;--tkink:#fbbf5c;--tkline:#4a3a1a}
 </style>
 </head>
 <body>
+<div class="tick" id="tick" role="status" hidden><div class="trk" id="trk"></div></div>
 <div class="hero"><div class="wrap">
 <button id="th" class="thbtn" type="button" aria-label="Alternar tema claro ou escuro">☀ Modo claro</button>
 <div class="eyebrow"><svg width="26" height="18" viewBox="0 0 26 18" fill="none" aria-hidden="true"><rect x="1" y="11" width="4" height="6" rx="1" fill="currentColor" opacity=".45"/><rect x="8" y="7" width="4" height="10" rx="1" fill="currentColor" opacity=".65"/><rect x="15" y="9" width="4" height="8" rx="1" fill="currentColor" opacity=".45"/><polyline points="2,9 9,4.5 16,7 24,1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="24" cy="1.8" r="1.8" fill="currentColor"/></svg><span>Consultas inteligentes</span></div>
@@ -364,6 +374,10 @@ function setTheme(t){root.setAttribute("data-theme",t);thb.textContent=t==="dark
 var sv="";try{sv=localStorage.getItem("tema")||""}catch(e){}
 setTheme(sv==="light"?"light":"dark");
 thb.onclick=function(){setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark")};
+var AVISO="O site da ANS está intermitente";
+(function(){var t=document.getElementById("tick"),k=document.getElementById("trk");if(!AVISO){return}
+var g=0,i,j;for(g=0;g<2;g++){var w=document.createElement("div");w.style.display="inline-flex";for(j=0;j<8;j++){var sp=document.createElement("span");sp.textContent=AVISO;w.appendChild(sp)}k.appendChild(w)}
+t.hidden=false})();
 load();loadRol();
 })();
 </script>
