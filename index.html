@@ -35,7 +35,7 @@ h1{font-size:clamp(22px,4.2vw,30px);margin:8px 0 6px;font-weight:700;letter-spac
 .tag{font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;margin-right:8px}
 .tag.f{background:rgba(200,150,62,.18);color:var(--warn)}.tag.v{background:rgba(31,122,77,.14);color:var(--ok)}
 details{margin-top:12px}summary{cursor:pointer;color:var(--brand2);font-size:13px;font-weight:600}
-dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;margin:12px 0 0}
+dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 14px;margin:12px 0 0}
 dt{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}dd{margin:0;font-size:13px;word-break:break-word}
 .empty{text-align:center;color:var(--muted);padding:48px 16px}
 button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:10px 16px;font-weight:600;background:var(--brand);color:var(--surface)}
@@ -112,6 +112,14 @@ dl>div.f dt{color:var(--fc,var(--muted));font-weight:700}
 @media (prefers-reduced-motion:reduce){.trk{animation:none}}
 :root{--tkbg:#fff3d6;--tkink:#7a4a00;--tkline:#f0d9a0}
 :root[data-theme="dark"]{--tkbg:#2a2113;--tkink:#fbbf5c;--tkline:#4a3a1a}
+.fw{grid-column:1/-1}
+@media (max-width:560px){
+dl{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+dl>div.f{padding:7px 9px}dl>div.f dd{font-size:12.5px}dl>div.f dt{font-size:9.5px}
+.ov{padding:10px}.mod.wide{padding:16px;max-height:92vh}
+.kpis{gap:6px}.kpi{padding:8px 9px}.kpi b{font-size:13px}.kpi small{font-size:9px}
+.ans{padding:12px}.mh h3{font-size:14px}
+}
 </style>
 </head>
 <body>
@@ -262,7 +270,7 @@ var dc=el("div","sec");dc.appendChild(el("h4","","Dados do procedimento (consult
 var cur=el("div");cur.appendChild(el("small","","Valor vigente  "));cur.appendChild(el("b","",mv(r)));
 cur.style.marginBottom="8px";dc.appendChild(cur);
 var dl=el("dl"),n=0;
-COLS.slice(2).forEach(function(k){var v=r[k];if(v===""||v==null||zero(v))return;n++;var d=el("div","f f-"+(FT[k]||"o"));d.appendChild(el("dt","",LABEL[k]));d.appendChild(el("dd","",MONEY[k]?brl(v):v));dl.appendChild(d)});
+COLS.slice(2).forEach(function(k){var v=r[k];if(v===""||v==null||zero(v))return;n++;var d=el("div","f f-"+(FT[k]||"o")+(String(v).length>26?" fw":""));d.appendChild(el("dt","",LABEL[k]));d.appendChild(el("dd","",MONEY[k]?brl(v):v));dl.appendChild(d)});
 if(n)dc.appendChild(dl);dc.appendChild(ansBlock(r));m.appendChild(dc);
 var list=chg[String(r.COD_SISAU).trim()],sc=el("div","sec");sc.appendChild(el("h4","","Tendência por vigência (consulta 2)"));
 if(!list){sc.appendChild(el("p","","Este item não possui alterações de vigência registradas."))}
@@ -374,7 +382,7 @@ function setTheme(t){root.setAttribute("data-theme",t);thb.textContent=t==="dark
 var sv="";try{sv=localStorage.getItem("tema")||""}catch(e){}
 setTheme(sv==="light"?"light":"dark");
 thb.onclick=function(){setTheme(root.getAttribute("data-theme")==="dark"?"light":"dark")};
-var AVISO="O site da ANS está intermitente";
+var AVISO="Verifique sempre a data de atualização";
 (function(){var t=document.getElementById("tick"),k=document.getElementById("trk");if(!AVISO){return}
 var g=0,i,j;for(g=0;g<2;g++){var w=document.createElement("div");w.style.display="inline-flex";for(j=0;j<8;j++){var sp=document.createElement("span");sp.textContent=AVISO;w.appendChild(sp)}k.appendChild(w)}
 t.hidden=false})();
